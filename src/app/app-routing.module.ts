@@ -15,7 +15,6 @@ import { OnboardingComponent } from './modules/onboarding/onboarding.component';
 import { WalletDetailsComponent } from './modules/wallet/pages/wallet-details/wallet-details.component';
 import { AccountListComponent } from './modules/wallet/pages/account-list/account-list.component';
 
-// TODO: Add breadcrumb data values
 const routes: Routes = [
   {
     path: '',

@@ -18,7 +18,7 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute, 
     private router: Router
   ) { }
-  breadcrumbs: Breadcrumb[];
+  breadcrumbs: Breadcrumb[] = [];
   private destroyed$ = new Subject<void>();
 
   ngOnInit(): void {

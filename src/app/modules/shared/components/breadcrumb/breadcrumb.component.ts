@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, Route, ResolveEnd, ActivatedRouteSnapshot, UrlSegment } from '@angular/router';
+import { Router, Route, ResolveEnd, ActivatedRouteSnapshot, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs';
 import { tap, takeUntil, filter } from 'rxjs/operators';
 
@@ -15,7 +15,6 @@ interface Breadcrumb {
 })
 export class BreadcrumbComponent implements OnInit, OnDestroy {
   constructor(
-    private route: ActivatedRoute, 
     private router: Router
   ) { }
   breadcrumbs: Breadcrumb[] = [];

@@ -1,12 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, Route, ResolveEnd, ActivatedRouteSnapshot, UrlSegment } from '@angular/router';
+import { Router, ResolveEnd, ActivatedRouteSnapshot, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs';
 import { tap, takeUntil, filter } from 'rxjs/operators';
 
 interface Breadcrumb {
     displayName: string, 
-    url: string,
-    route: Route | null,
+    url: string
 }
 
 @Component({
@@ -14,9 +13,7 @@ interface Breadcrumb {
   templateUrl: './breadcrumb.component.html',
 })
 export class BreadcrumbComponent implements OnInit, OnDestroy {
-  constructor(
-    private router: Router
-  ) { }
+  constructor(private router: Router) { }
   breadcrumbs: Breadcrumb[] = [];
   private destroyed$ = new Subject<void>();
 
@@ -61,8 +58,7 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
   createBreadcrumb(route: ActivatedRouteSnapshot, url: string): Breadcrumb {
     return {
       displayName: route.data['breadcrumb'],
-      url: url,
-      route: route.routeConfig
+      url: url
     };
   }
 

@@ -15,6 +15,7 @@ import { OnboardingComponent } from './modules/onboarding/onboarding.component';
 import { WalletDetailsComponent } from './modules/wallet/pages/wallet-details/wallet-details.component';
 import { AccountListComponent } from './modules/wallet/pages/account-list/account-list.component';
 
+// TODO: Add breadcrumb data values
 const routes: Routes = [
   {
     path: '',
@@ -25,20 +26,32 @@ const routes: Routes = [
     path: 'onboarding',
     component: OnboardingComponent,
     canActivate: [AuthredirectGuard],
+    data: {
+      breadcrumb: 'Onboarding'
+    }
   },
   {
     path: 'login',
     component: LoginComponent,
     canActivate: [NoWalletFoundGuard, AuthredirectGuard],
+    data: {
+      breadcrumb: 'Login'
+    }
   },
   {
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [AuthGuard],
+    data: {
+      breadcrumb: 'Dashboard'
+    },
     children: [
       {
         path: 'gains-and-losses',
         component: GainsAndLossesComponent,
+        data: {
+          breadcrumb: 'Gains & Losses'
+        }
       },
       {
         path: 'wallet',
@@ -46,10 +59,16 @@ const routes: Routes = [
           {
             path: 'accounts',
             component: AccountListComponent,
+            data: {
+              breadcrumb: 'Wallet Accounts'
+            }
           },
           {
             path: 'details',
             component: WalletDetailsComponent,
+            data: {
+              breadcrumb: 'Wallet Details'
+            }
           },
         ]
       },
@@ -59,10 +78,16 @@ const routes: Routes = [
           {
             path: 'logs',
             component: LogsComponent,
+            data: {
+              breadcrumb: 'System Logs'
+            }
           },
           {
             path: 'metrics',
             component: MetricsComponent,
+            data: {
+              breadcrumb: 'System Metrics'
+            }
           },
         ]
       },
@@ -72,6 +97,9 @@ const routes: Routes = [
           {
             path: 'change-password',
             component: ChangePasswordComponent,
+            data: {
+              breadcrumb: 'Change Password'
+            }
           },
         ]
       }

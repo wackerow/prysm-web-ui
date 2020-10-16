@@ -60,10 +60,16 @@ export class AppPage {
       ).all(by.tagName('textarea')).get(0);
   }
 
-  getInput(i: number): ElementFinder {
+  getFirstInput(): ElementFinder {
     return element(
       by.css('.mat-horizontal-content-container [aria-expanded="true"]')
-      ).all(by.tagName('input')).get(i);
+      ).all(by.tagName('input')).get(0);
+  }
+
+  getSecondInput(): ElementFinder {
+    return element(
+      by.css('.mat-horizontal-content-container [aria-expanded="true"]')
+      ).all(by.tagName('input')).get(1);
   }
 
   getWizardComponent(): ElementFinder {

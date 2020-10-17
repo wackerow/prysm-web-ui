@@ -12,6 +12,14 @@ describe('workspace-project App', () => {
   const ALLOWS_HD_ONBOARDING = 'Should allow a user to generate new mnemonic and create new HD wallet';
 
   it(`${ALLOWS_HD_ONBOARDING} w/ Simple navigation`, () => {
+    /**
+     * Tests user navigating through wizard using 'Continue' buttons, entering
+     * valid information at each step, without going back
+     *
+     * Intended Pathway:
+     * Home (/login) -> Onboarding (/onboarding) -> HD Wallet Wizard, Step 1 ->
+     *  Step 2 -> Step 3 -> Step 4 -> Step 5 -> Complete
+     */
     page.navigateTo();
 
     // Home Page
@@ -48,12 +56,16 @@ describe('workspace-project App', () => {
     // Click 'Continue' button -> Proceed to Step 3
     page.getContinueButton().click();
 
+    // Check Step 3 tab selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
     // Check form control name
     expect(page.getFirstInput().getAttribute('formcontrolname')).toEqual('walletDir');
     // Leave default data value
     // Click 'Continue' button -> Proceed to Step 4
     page.getContinueButton().click();
 
+    // Check Step 4 tab selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
     // Check form control name
     expect(page.getFirstInput().getAttribute('formcontrolname')).toEqual('numAccounts');
     // Type '1' into input field (1 validator)
@@ -61,6 +73,8 @@ describe('workspace-project App', () => {
     // Click 'Continue' button -> Proceed to Step 5
     page.getContinueButton().click();
 
+    // Check Step 5 tab selected
+    expect(page.getMatStepHeaderElement(5).getAttribute('aria-selected')).toEqual('true');
     // Check form control names
     expect(page.getFirstInput().getAttribute('formcontrolname')).toEqual('password');
     expect(page.getSecondInput().getAttribute('formcontrolname')).toEqual('passwordConfirmation');
@@ -75,7 +89,17 @@ describe('workspace-project App', () => {
   });
 
   it(`${ALLOWS_HD_ONBOARDING} w/ Appropriate forward navigation blocking (linear wizard)`, () => {
-    // TODO: Add error message testing to unit test
+    /**
+     * Tests linear property of form wizard, assuring that forward navigation (both with
+     * 'Continue' button and with header tab navigation) is properly disabled until user
+     * enters valid form data.
+     *
+     * Intended Pathway:
+     * Home (/login) -> Onboarding (/onboarding) -> HD Wallet Wizard, Step 1 ->
+     *  Step 2 -> Step 3 -> Step 4 -> Step 5 -> Complete
+     *
+     * TODO: Add error message testing to unit test
+     */
     page.navigateTo();
 
     // Home Page
@@ -197,6 +221,18 @@ describe('workspace-project App', () => {
   });
 
   it(`${ALLOWS_HD_ONBOARDING} w/ Complex navigation`, () => {
+    /**
+     * Tests user navigating through wizard using every 'Continue' or 'Previous'
+     * button throughout, and also utilizing all header tab navigation links.
+     *
+     * Intended Pathway (Forward two, back one approach):
+     * Home -> Onboarding (O) -> Step 1 (1) -> O -> 1 -> Step 2 (2) -> 1 -> 2 ->
+     *  Step 3 (3) -> 2 -> 3 -> Step 4 (4) -> 3 -> 4 -> Step 5 (5) -> 4 -> 5 ->
+     * [Using buttons to navigate] 4 -> 3 -> 2 -> 1 -> 2 -> 3 -> 4 -> 5 ->
+     * [Using header tabs to navigate] 1 -> 2 -> 3 -> 4 -> 5 -> Complete
+     *
+     * TODO: Check form inputs have not changed after navigating away and returning
+     */
     page.navigateTo();
 
     // Home Page
@@ -218,7 +254,7 @@ describe('workspace-project App', () => {
     expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
     // Click 'Previous' button -> Back to 'Onboarding'
     page.getPreviousButton().click();
-  
+
     // Check: Onboarding Page
     expect(page.getOnboardingHeader()).toEqual('Create a Wallet');
     // Click 'HD Wallet' section -> Sets focus

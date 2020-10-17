@@ -1,5 +1,6 @@
 import { AppPage } from './app.po';
 import { browser, logging } from 'protractor';
+import { protractor } from 'protractor/built/ptor';
 
 describe('workspace-project App', () => {
   let page: AppPage;
@@ -28,13 +29,17 @@ describe('workspace-project App', () => {
     page.getActiveCardButton().click();
 
     // Onboarding > HD Wallet Wizard Page
+    // Check Step 1 tab selected
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Check mnemonic is list of 24 space-separated lowercase words (note: English)
+    expect(page.getMnemonicPhrase()).toMatch(/([a-z]+ ){23}[a-z]+/);
     // Store generated mnemonic phrase to simulate writing it down
     const mnemonic = page.getMnemonicPhrase();
-    // Check mnemonic is list of 24 space-separated lowercase words
-    expect(mnemonic).toMatch(/([a-z]+ ){23}[a-z]+/);
     // Click 'Continue' button -> Proceed to Step 2
     page.getContinueButton().click();
 
+    // Check Step 2 tab selected
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
     // Check form control name
     expect(page.getTextArea().getAttribute('formcontrolname')).toEqual('mnemonic');
     // Click into text field and type saved mnemonic
@@ -66,10 +71,11 @@ describe('workspace-project App', () => {
     expect(page.getContinueButton().getAttribute('ng-reflect-disabled')).toEqual('false');
     // Click 'Continue' button -> Proceed to wallet generation
     page.getContinueButton().click();
-    // TODO: Confirm deposit data results
+    // (Deposit Data tested in unit test)
   });
 
-  it(`${ALLOWS_HD_ONBOARDING} w/ Proper navigation restriction if password invalid`, () => {
+  it(`${ALLOWS_HD_ONBOARDING} w/ Appropriate forward navigation blocking (linear wizard)`, () => {
+    // TODO: Add error message testing to unit test
     page.navigateTo();
 
     // Home Page
@@ -87,33 +93,79 @@ describe('workspace-project App', () => {
     page.getActiveCardButton().click();
 
     // Onboarding > HD Wallet Wizard Page
+    // Check Step 1 tab selected
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Check mnemonic is list of 24 space-separated lowercase words (note: English)
+    expect(page.getMnemonicPhrase()).toMatch(/([a-z]+ ){23}[a-z]+/);
     // Store generated mnemonic phrase to simulate writing it down
     const mnemonic = page.getMnemonicPhrase();
-    // Check mnemonic is list of 24 space-separated lowercase words
-    expect(mnemonic).toMatch(/([a-z]+ ){23}[a-z]+/);
-    // Click 'Continue' button -> Proceed to Step 2
-    page.getContinueButton().click();
+    // Attempt improper navigation to steps 5, 4 and 3 via mat-step-header tabs
+    // Click each unavailable tab, and check that Step 1 tab remains selected
+    page.getMatStepHeaderElement(5).click();
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(4).click();
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(3).click();
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Confirm Mnemonic' tab -> Proceed to Step 2
+    page.getMatStepHeaderElement(2).click();
 
-    // Check form control name
-    expect(page.getTextArea().getAttribute('formcontrolname')).toEqual('mnemonic');
-    // Click into text field and type saved mnemonic
-    page.getTextArea().click();
+    // Check Step 2 tab selected
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    // Attempt to continue with empty string, invalid string, and wrong mnemonic
+    // ForEach: Click 'Continue', Check that Step 2 tab remains selected
+    page.getContinueButton().click();
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getTextArea().sendKeys('invalid');
+    page.getContinueButton().click();
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getTextArea().clear();
+    page.getTextArea().sendKeys(mnemonic.then(value => value.substr(1)));
+    page.getContinueButton().click();
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getTextArea().clear();
+    // Enter valid matching mnemonic
     page.getTextArea().sendKeys(mnemonic);
-    // Click 'Continue' button -> Proceed to Step 3
-    page.getContinueButton().click();
+    // Click 'Wallet' tab -> Proceed to Step 3
+    page.getMatStepHeaderElement(3).click();
 
-    // Check form control name
-    expect(page.getFirstInput().getAttribute('formcontrolname')).toEqual('walletDir');
-    // Leave default data value
-    // Click 'Continue' button -> Proceed to Step 4
+    // Check Step 3 tab selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    // "Cut" default directory to test empty string
+    const directory = page.getFirstInput().getAttribute('data-placeholder');
+    // Replacement for .clear() method to update DOM correctly
+    page.getFirstInput().sendKeys(protractor.Key.chord(protractor.Key.CONTROL, 'a'));
+    try { page.getFirstInput().sendKeys(protractor.Key.chord(protractor.Key.COMMAND, 'a')); }
+    catch (e) { return; }
+    page.getFirstInput().sendKeys(protractor.Key.BACK_SPACE);
+    // Attempt to continue with empty string
     page.getContinueButton().click();
+    // Check that Step 3 tab remains selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    // "Paste" valid default directory again
+    page.getFirstInput().sendKeys(directory);
+    // Click 'Account Creation" tab -> Proceed to Step 4
+    page.getMatStepHeaderElement(4).click();
 
-    // Check form control name
-    expect(page.getFirstInput().getAttribute('formcontrolname')).toEqual('numAccounts');
+    // Check Step 4 tab selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    // Attempt to continue without entering number of validators
+    page.getContinueButton().click();
+    // Check that correct error message populates
+    // expect(page.getMatError()).toContain('Num accounts is required');
+    // Check that Step 4 tab remains selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
     // Type '1' into input field (1 validator)
     page.getFirstInput().sendKeys(1);
     // Click 'Continue' button -> Proceed to Step 5
     page.getContinueButton().click();
+
+    /**
+     * For Steps 2, 3, and 4 -- Should also add:
+     *  expect(page.getContinueButton().getAttribute('disabled')).toEqual('true');
+     * but this will fail right now as the styling on these buttons is not currently
+     * affected by the validity of the form controls
+     */
 
     // Declare password constants
     const invalidPassword = 'invalid';
@@ -141,7 +193,19 @@ describe('workspace-project App', () => {
     expect(page.getContinueButton().getAttribute('ng-reflect-disabled')).toEqual('false');
     // Click 'Continue' button -> Proceed to wallet generation
     page.getContinueButton().click();
-    // TODO: Confirm deposit data results
+    // (Deposit Data tested in unit test)
+  });
+
+  it(`${ALLOWS_HD_ONBOARDING} w/ Complex navigation (TODO)`, () => {
+    page.navigateTo();
+    /* TODO: Test that going back saves state
+    Both with "Previous" button and with mat-horizontal-stepper-HEADER-container navigation
+    [ ] home > onboarding >
+            > 1 > O > 1 > 2 > 1 [expect mnemonic hasn't changed]
+            > 2  > 3 > (back) 2 [expect mnemonic still entered]
+            > 3  > 4 > (back) 3 [expect input field unchanged]
+            > 4  > 5 > (back) 4 [expect input field unchanged]
+            > 5 > 4 > 3 > 2 > 1 > 2 > 3 > 4 > 5 > done */
   });
 
   afterEach(async () => {

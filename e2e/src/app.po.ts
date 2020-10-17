@@ -3,6 +3,8 @@ import { browser, by, element, ElementFinder, $ } from 'protractor';
 export class AppPage {
   HORIZONTAL_CONTAINER = '.mat-horizontal-content-container';
   VERTICAL_CONTAINER = '.mat-vertical-content-container';
+  HORIZONTAL_HEADER = '.mat-horizontal-stepper-header-container';
+  VERTICAL_HEADER = '.mat-vertical-stepper-header-container';
 
   navigateTo(): Promise<unknown> {
     return browser.get(browser.baseUrl) as Promise<unknown>;
@@ -44,12 +46,22 @@ export class AppPage {
    * /onboarding - HD Wallet Setup wizard
    */
   // TODO: Refactor below to also test mobile ('.mat-vertical...')
+  getMatStepHeaderElement(step: number): ElementFinder {
+    if (element(by.css(`${this.HORIZONTAL_HEADER}`))) {
+      return element(
+        by.css(`${this.HORIZONTAL_HEADER}`)
+      ).all(by.tagName('mat-step-header')).get(step - 1);
+    }
+    return element(
+      by.css(`${this.VERTICAL_HEADER}`)
+    ).all(by.tagName('mat-step-header')).get(step - 1);
+  }
 
   getMnemonicPhrase(): Promise<string> {
     return element(
       by.tagName('app-generate-mnemonic')
-      ).all(by.tagName('div')).get(1).getText() as Promise<string>;
-    }
+    ).all(by.tagName('div')).get(1).getText() as Promise<string>;
+  }
 
   getPreviousButton(): ElementFinder {
     if (element(by.css(`${this.HORIZONTAL_CONTAINER}`))) {
@@ -63,38 +75,52 @@ export class AppPage {
   }
 
   getContinueButton(): ElementFinder {
+    if (element(by.css(`${this.HORIZONTAL_CONTAINER}`))) {
+      return element(
+        by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      ).all(by.tagName('button')).get(1);
+    }
     return element(
-      by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      by.css(`${this.VERTICAL_CONTAINER} [aria-expanded="true"]`)
     ).all(by.tagName('button')).get(1);
   }
 
-  getMatStepHeaderElement(step: number): ElementFinder {
-    return element(
-      by.css(`.mat-horizontal-stepper-header-container`)
-    ).all(by.tagName('mat-step-header')).get(step - 1);
-  }
-
   getTextArea(): ElementFinder {
+    if (element(by.css(`${this.HORIZONTAL_CONTAINER}`))) {
+      return element(
+        by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      ).all(by.tagName('textarea')).get(0);
+    }
     return element(
-      by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      by.css(`${this.VERTICAL_CONTAINER} [aria-expanded="true"]`)
     ).all(by.tagName('textarea')).get(0);
   }
 
   getFirstInput(): ElementFinder {
+    if (element(by.css(`${this.HORIZONTAL_CONTAINER}`))) {
+      return element(
+        by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      ).all(by.tagName('input')).get(0);
+    }
     return element(
-      by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      by.css(`${this.VERTICAL_CONTAINER} [aria-expanded="true"]`)
     ).all(by.tagName('input')).get(0);
   }
 
   getSecondInput(): ElementFinder {
+    if (element(by.css(`${this.HORIZONTAL_CONTAINER}`))) {
+      return element(
+        by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      ).all(by.tagName('input')).get(1);
+    }
     return element(
-      by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      by.css(`${this.VERTICAL_CONTAINER} [aria-expanded="true"]`)
     ).all(by.tagName('input')).get(1);
   }
 
   getMatError(): ElementFinder {
     return element(
-      by.css(`${this.HORIZONTAL_CONTAINER} [aria-expanded="true"]`)
+      by.css(`${this.VERTICAL_CONTAINER} [aria-expanded="true"]`)
     ).all(by.className('mat-error')).get(0);
   }
 }

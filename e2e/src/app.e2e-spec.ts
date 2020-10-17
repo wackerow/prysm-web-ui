@@ -196,16 +196,151 @@ describe('workspace-project App', () => {
     // (Deposit Data tested in unit test)
   });
 
-  it(`${ALLOWS_HD_ONBOARDING} w/ Complex navigation (TODO)`, () => {
+  it(`${ALLOWS_HD_ONBOARDING} w/ Complex navigation`, () => {
     page.navigateTo();
-    /* TODO: Test that going back saves state
-    Both with "Previous" button and with mat-horizontal-stepper-HEADER-container navigation
-    [ ] home > onboarding >
-            > 1 > O > 1 > 2 > 1 [expect mnemonic hasn't changed]
-            > 2  > 3 > (back) 2 [expect mnemonic still entered]
-            > 3  > 4 > (back) 3 [expect input field unchanged]
-            > 4  > 5 > (back) 4 [expect input field unchanged]
-            > 5 > 4 > 3 > 2 > 1 > 2 > 3 > 4 > 5 > done */
+
+    // Home Page
+    // Check onboarding button text
+    expect(page.getOnboardingButton().getText()).toEqual('Create a Wallet');
+    // Click button -> Navigate to Onboarding
+    page.getOnboardingButton().click();
+
+    // Onboarding Page
+    // Check page header text
+    expect(page.getOnboardingHeader()).toEqual('Create a Wallet');
+    // Click 'HD Wallet' section -> Sets focus
+    page.getHDWalletDiv().click();
+    // Click 'Select Wallet' button -> Navigate to HD Wallet Wizard (Step 1)
+    page.getActiveCardButton().click();
+
+    // Onboarding > HD Wallet Wizard Page
+    // Check Step 1 tab selected
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Previous' button -> Back to 'Onboarding'
+    page.getPreviousButton().click();
+  
+    // Check: Onboarding Page
+    expect(page.getOnboardingHeader()).toEqual('Create a Wallet');
+    // Click 'HD Wallet' section -> Sets focus
+    page.getHDWalletDiv().click();
+    // Click 'Select Wallet' button -> Navigate to HD Wallet Wizard (Step 1)
+    page.getActiveCardButton().click();
+
+    // Check Step 1 tab selected
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Check mnemonic is list of 24 space-separated lowercase words (note: English)
+    expect(page.getMnemonicPhrase()).toMatch(/([a-z]+ ){23}[a-z]+/);
+    // Store generated mnemonic phrase to simulate writing it down
+    const mnemonic = page.getMnemonicPhrase();
+    // Click 'Continue' button -> Proceed to Step 2
+    page.getContinueButton().click();
+
+    // Check Step 2 tab selected
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Previous' button -> Back to Step 1
+    page.getPreviousButton().click();
+
+    // Check Step 1 tab selected
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    // Check 'mnemonic' has not changed
+    expect(page.getMnemonicPhrase()).toEqual(mnemonic);
+    // Click 'Continue' button -> Proceed to Step 2
+    page.getContinueButton().click();
+
+    // Check Step 2 tab selected
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    // Click into text field and type saved mnemonic
+    page.getTextArea().click();
+    page.getTextArea().sendKeys(mnemonic);
+    // Click 'Continue' button -> Proceed to Step 3
+    page.getContinueButton().click();
+
+    // Check Step 3 tab selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Previous' button -> Back to Step 2
+    page.getPreviousButton().click();
+
+    // Check Step 2 tab selected
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    // TODO: Check textarea field has not changed
+    // Click 'Continue' button -> Proceed to Step 3
+    page.getContinueButton().click();
+
+    // Check Step 3 tab selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    // Leave default data value, store value for later check
+    const directory = page.getFirstInput().getAttribute('data-placeholder');
+    // Click 'Continue' button -> Proceed to Step 4
+    page.getContinueButton().click();
+
+    // Check Step 4 tab selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Previous' button -> Back to Step 3
+    page.getPreviousButton().click();
+
+    // Check Step 3 tab selected
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    // TODO: Check input field has not changed
+    // Click 'Continue' button -> Proceed to Step 4
+    page.getContinueButton().click();
+
+    // Check Step 4 tab selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    // Type '1' into input field (1 validator)
+    page.getFirstInput().sendKeys(1);
+    // Click 'Continue' button -> Proceed to Step 5
+    page.getContinueButton().click();
+
+    // Check Step 5 tab selected
+    expect(page.getMatStepHeaderElement(5).getAttribute('aria-selected')).toEqual('true');
+    // Type matching valid passwords
+    page.getFirstInput().sendKeys('Valid$2020');
+    page.getSecondInput().sendKeys('Valid$2020');
+    // Click 'Previous' button -> Back to Step 4
+    page.getPreviousButton().click();
+
+    // Check Step 4 tab selected
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    // TODO: Check input field has not changed
+    // Click 'Continue' button -> Proceed to Step 5
+    page.getContinueButton().click();
+
+    // Check Step 5 tab selected
+    expect(page.getMatStepHeaderElement(5).getAttribute('aria-selected')).toEqual('true');
+    // Check 'Create Wallet' button is not disabled (previously entered passwords persisted)
+    expect(page.getContinueButton().getAttribute('ng-reflect-disabled')).toEqual('false');
+
+    // With completed form, fully navigate all steps then submit
+    // browser.sleep(700) utilized to allow for transition animation time.
+    page.getPreviousButton().click().then(() => browser.sleep(700)); // Back to Step 4
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    page.getPreviousButton().click().then(() => browser.sleep(700)); // Back to Step 3
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    page.getPreviousButton().click().then(() => browser.sleep(700)); // Back to Step 2
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getPreviousButton().click().then(() => browser.sleep(700)); // Back to Step 1
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    page.getContinueButton().click().then(() => browser.sleep(700)); // Proceed to Step 2
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getContinueButton().click().then(() => browser.sleep(700)); // Proceed to Step 3
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    page.getContinueButton().click().then(() => browser.sleep(700)); // Proceed to Step 4
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    page.getContinueButton().click().then(() => browser.sleep(700)); // Proceed to Step 5
+    expect(page.getMatStepHeaderElement(5).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(1).click().then(() => browser.sleep(700)); // Tab to Step 1
+    expect(page.getMatStepHeaderElement(1).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(2).click().then(() => browser.sleep(700)); // Tab to Step 2
+    expect(page.getMatStepHeaderElement(2).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(3).click().then(() => browser.sleep(700)); // Tab to Step 3
+    expect(page.getMatStepHeaderElement(3).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(4).click().then(() => browser.sleep(700)); // Tab to Step 4
+    expect(page.getMatStepHeaderElement(4).getAttribute('aria-selected')).toEqual('true');
+    page.getMatStepHeaderElement(5).click().then(() => browser.sleep(700)); // Tab to Step 5
+    expect(page.getMatStepHeaderElement(5).getAttribute('aria-selected')).toEqual('true');
+    // Click 'Continue' button -> Proceed to wallet generation
+    page.getContinueButton().click();
+    // (Deposit Data tested in unit test)
   });
 
   afterEach(async () => {

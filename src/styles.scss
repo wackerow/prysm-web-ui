@@ -184,3 +184,14 @@ mat-cell, mat-header-cell, mat-footer-cell {
 .snackbar-warn {
   background-color: #e95455;
 }
+
+span.preformatted {
+  font-family: monospace;
+  white-space: pre;
+  border: 1px solid $paper;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: inline;
+  padding-left: 7px;
+  padding-right: 7px;
+  border-radius: 5px;
+}

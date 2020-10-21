@@ -3,7 +3,12 @@
     Pick a Wallet Directory
   </div>
   <div class="my-4 text-hint text-lg leading-snug">
-    Enter the directory where you want to store your wallet. By default, a wallet will be created at {{linux}} for Linux machines, {{macos}} for MacOS, or {{windows}} for windows computers, leave blank to use the default value.
+    Enter the directory where you want to store your wallet. If left blank, a wallet will be created at:
+    <ul>
+      <li>Linux: <span class="preformatted">{{ linux }}</span></li>
+      <li>MacOS: <span class="preformatted">{{ macos }}</span></li>
+      <li>Windows: <span class="preformatted">{{ windows }}</span></li>
+    </ul>
   </div>
   <mat-form-field appearance="outline">
     <mat-label>Enter desired wallet directory</mat-label>
